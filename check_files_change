@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# Author: Andreas Pfeiffer - IT-Parnter-Berlin.de  
 # 0 = NO NOTIFICATION; 1 = WARNING; 2 = CRITICAL
 
 STATE_ERROR=2
@@ -39,8 +40,7 @@ WARNING=$2
 CRITICAL=$4
 DIR=$6
 
-# Lets get to work
-
+#check if warning is lower than critical and a Directroy was provided. 
 if [ $WARNING -lt $CRITICAL ] && [ $6 ];
 then
         CHECK_PROCESS="$(find $DIR -type f -mtime -1 -print | wc -l )"
@@ -48,11 +48,11 @@ then
 	if [ -n "$CHECK_PROCESS" ];
 	then
 
-# Output the check results on the command line
+	# Output the check results on the command line - only for DEBUG
+	
+	#		echo $CHECK_PROCESS
 
-#		echo $CHECK_PROCESS
-
-# Check if is it critical
+	# Check if is it critical
 
 		if [ $CHECK_PROCESS -gt $CRITICAL ];
 		then
@@ -68,7 +68,7 @@ then
 		fi
 
 
-# In case the checked service is not running, do the following
+	# some errors in the find command 
 
 	else
 	echo "Error in the Command - Directory exist ?"
@@ -78,7 +78,7 @@ then
 else
 
 
-# In case we received a wrong syntax, do the following
+	# In case we received a wrong syntax, do the following
 
         echo "Syntax_Error: Usage: check_files_change -w <warning> -c <critical> -d <directory>"
 	echo "Use '--help' for help!"
