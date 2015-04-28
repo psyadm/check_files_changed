@@ -1,0 +1,86 @@
+#!/bin/bash
+#
+# 0 = NO NOTIFICATION; 1 = WARNING; 2 = CRITICAL
+
+STATE_ERROR=2
+
+
+# Set States
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+
+
+# Set help
+print_help () {
+	echo ""
+	echo "Usage: check_files_change -w <warning> -c <critical> -d <directory>"
+	echo ""
+	echo "This plugin checks how many files in a directory have changed in the last 24h"
+	echo "get number of changed files"
+	echo ""
+	exit 0
+}
+
+# Read input
+case "$1" in
+
+	--help)
+		print_help
+		exit $STATE_OK
+		;;
+	-h)
+		print_help
+		exit $STATE_OK
+		;;
+esac
+
+WARNING=$2
+CRITICAL=$4
+DIR=$6
+
+# Lets get to work
+
+if [ $WARNING -lt $CRITICAL ] && [ $6 ];
+then
+        CHECK_PROCESS="$(find $DIR -type f -mtime -1 -print | wc -l )"
+
+	if [ -n "$CHECK_PROCESS" ];
+	then
+
+# Output the check results on the command line
+
+#		echo $CHECK_PROCESS
+
+# Check if is it critical
+
+		if [ $CHECK_PROCESS -gt $CRITICAL ];
+		then
+			echo "CRITICAL Current files changed: $CHECK_PROCESS | files_changed=$CHECK_PROCESS"
+			exit $STATE_CRITICAL
+		elif [ $CHECK_PROCESS -gt $WARNING ];
+		then
+			echo "WARNING Current files changed: $CHECK_PROCESS | files_changed=$CHECK_PROCESS"
+			exit $STATE_WARNING
+		else
+			echo "OK files changed:  $CHECK_PROCESS | files_changed=$CHECK_PROCESS"
+			exit $STATE_OK
+		fi
+
+
+# In case the checked service is not running, do the following
+
+	else
+	echo "Error in the Command - Directory exist ?"
+	exit $STATE_ERROR
+	fi
+
+else
+
+
+# In case we received a wrong syntax, do the following
+
+        echo "Syntax_Error: Usage: check_files_change -w <warning> -c <critical> -d <directory>"
+	echo "Use '--help' for help!"
+        exit $STATE_OK
+fi
